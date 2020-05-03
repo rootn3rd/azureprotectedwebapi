@@ -36,6 +36,31 @@ Below sample shows steps required in azure portal
     | Directory (tenant) ID   |
     | Application ID URI      |
 
+7. Code changes 
+
+* Add following values `appSettings.json` 
+
+        "AAD": {
+            "ResourceId": "api://{app-resource-id}",
+            "InstanceId": "https://login.microsoftonline.com/",
+            "TenantId": "{tenant-id}"
+        }
+
+* Add following in `Startup.cs`
+
+        services
+            .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.Audience = Configuration["AAD:ResourceId"];
+                options.Authority = $"{Configuration["AAD:InstanceId"]}{Configuration["AAD:TenantId"]}";
+
+            });
+
+        // Configure
+        app.UseAuthentication();
+
+* Decorate `Controllers` with `[Authorize]` attribute
 -----
 
 # Register Protected WebAPI Client
@@ -48,3 +73,24 @@ Below sample shows steps required in azure portal
 5. API Permissions - Add a permission - My API - `WeatherAPI_Development` - Select `DaemonAppRole`
 
 6. Grab the following values from Overview page -
+
+    | WeatherAPIClient_Development  |
+    | ----------------------- |
+    | Application (client) ID |
+    | Directory (tenant) ID   |
+    | Application ID URI      |
+
+7. Code changes 
+
+* Create and add following values `appSettings.json` 
+
+```
+{
+    "Instance": "https://login.microsoftonline.com/{0}",
+    "TenantId": "{tenant-id",
+    "ClientId": "{client/application-id}",
+    "ClientSecret": "{application-secret}",
+    "BaseAddress": "https://localhost:5001/weatherforecast",
+    "ResourceId": "api://{resource-id}/.default" 
+}
+```
